@@ -46,13 +46,21 @@
                 <input name="fullName" class="easyui-textbox" required="true" label="Full Name:" style="width:100%">
             </div>
             <div style="margin-bottom:10px">
-                <input name="gender" class="easyui-textbox" required="true" label="Gender:" style="width:100%">
+                <select name="gender" class="easyui-combobox" required="true" label="Gender:" style="width:100%">
+                    <option value="0">Male</option>
+                    <option value="1">Female</option>
+                </select>
             </div>
             <div style="margin-bottom:10px">
-                <input name="dateOfBirth" class="easyui-textbox" required="true" label="Date Of Birth:" style="width:100%">
+                <input name="dateOfBirth" class="easyui-datebox" required="true" label="Date Of Birth:" style="width:100%">
             </div>
             <div style="margin-bottom:10px">
-                <input name="isStaff" class="easyui-textbox" label="Is Staff:" style="width:100%">
+                <div style="margin-bottom:20px">
+                    <input class="easyui-radiobutton" name="isStaff" value="true" label="Is Staff:">
+                </div>
+                <div style="margin-bottom:20px">
+                    <input class="easyui-radiobutton" name="isStaff" value="false" label="Not staff:">
+                </div>
             </div>
         </form>
     </div>
@@ -99,7 +107,14 @@
                 },
                 {
                     field: 'isStaff',
-                    title: 'Regular/external'
+                    title: 'State',
+                    formatter: function (value, row, index) {
+                        if (value) {
+                            return 'Is Staff';
+                        } else {
+                            return 'Not staff';
+                        }
+                    }
                 }
             ]],
             toolbar: '#tb',

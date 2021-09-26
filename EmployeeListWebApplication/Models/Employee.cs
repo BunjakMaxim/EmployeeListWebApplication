@@ -19,10 +19,10 @@ namespace EmployeeListWebApplication.Models
 			switch (this.IsStaff)
 			{
 				case true when string.IsNullOrEmpty(PersonnelNumber):
-					yield return new ValidationResult("Для штатного сотрудніка обязятелено заполнение табельного номера");
+					yield return new ValidationResult("For a full-time employee, it is obligatory to fill in the personnel number");
 					break;
 				case false when !string.IsNullOrEmpty(PersonnelNumber):
-					yield return new ValidationResult("У внештатного сотрудника не должно быть табельного номера");
+					yield return new ValidationResult("A freelance employee should not have a personnel number");
 					break;
 			}
 
