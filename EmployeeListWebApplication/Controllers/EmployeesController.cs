@@ -83,6 +83,11 @@ namespace EmployeeListWebApplication.Controllers
 		[HttpPost]
 		public async Task<IActionResult> UploadFromFile(IFormFile uploadedFile)
 		{
+			if (uploadedFile == null)
+			{
+				return BadRequest();
+			}
+
 			List<Employee> employees;
 
 			using (var uploadStream = uploadedFile.OpenReadStream())
@@ -142,13 +147,11 @@ namespace EmployeeListWebApplication.Controllers
 				{
 					empl.Id = 0;
 					await _dbContext.Employees.AddAsync(empl);
-				} else
+				} 
+				else
 				{
-					employee.PersonnelNumber = employee.PersonnelNumber;
-					employee.Gender = empl.Gender;
-					employee.FullName = empl.FullName;
-					employee.DateOfBirth = employee.DateOfBirth;
-					employee.IsStaff = employee.IsStaff;
+					empl.Id = employee.Id;
+					_dbContext.Entry(employee).CurrentValues.SetValues(empl);
 				}
 
 				await _dbContext.SaveChangesAsync();

@@ -25,7 +25,7 @@
 
             <div>
                 <form id="uploadFile" enctype="multipart/form-data" method="post">
-                    <input id="chooseFile" accept='json' class="easyui-filebox" name="uploadedFile" data-options="prompt:'Choose a file...'">
+                    <input id="chooseFile" accept='json' class="easyui-filebox" name="uploadedFile" required="true" data-options="prompt:'Choose a file...'">
                 </form>
             </div>
         </div>
@@ -139,20 +139,13 @@
         function uploadEmployeesFile() {
             $('#uploadFile').form('submit', {
                 url: '/Employees/UploadFromFile',
-                success: function (result) {
-                    console.log(result)
-
-                    if (result) {
-                        $.messager.show({
-                            title: 'Error',
-                            msg: result
-                        });
-                    } else {
-                        $('#file-dlg').dialog('close');        // close the dialog
-                        $('#dg').datagrid('reload');    // reload the employee data
-                    }
+                onSubmit: function () {
+                    return $(this).form('validate');
                 }
             });
+
+            $('#file-dlg').dialog('close');        // close the dialog
+            $('#dg').datagrid('reload');    // reload the employee data
         }
 
         var url;
