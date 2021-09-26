@@ -1,0 +1,204 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Employee List</title>
+
+    <link rel="stylesheet" type="text/css" href="/lib/jquery-easyui-1.9/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="/lib/jquery-easyui-1.9/themes/default/icon.css">
+    <script type="text/javascript" src="/lib/jquery-easyui-1.9/jquery.min.js"></script>
+    <script type="text/javascript" src="/lib/jquery-easyui-1.9/jquery.easyui.min.js"></script>
+</head>
+<body>
+    <table id="dg"></table>
+
+    <div id="tb">
+        <a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="newEmployeesByFile()">Add By File</a>
+        <a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="newEmployee()">Add</a>
+        <a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="editEmployee()">Edit</a>
+        <a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="destroyEmployee()">Delete</a>
+    </div>
+
+    <div id="file-dlg" class="easyui-dialog" style="width:480px" data-options="closed:true,modal:true,border:'thin',buttons:'#dlg-file-buttons'">
+        <div style="margin:0;padding:20px 50px">
+            <h3>Uploading Employee Information</h3>
+
+            <div>
+                <form id="uploadFile" enctype="multipart/form-data" method="post">
+                    <input id="chooseFile" accept='json' class="easyui-filebox" name="uploadedFile" data-options="prompt:'Choose a file...'">
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="dlg-file-buttons">
+        <a href="javascript:void(0)" class="easyui-linkbutton c6" iconCls="icon-ok" onclick="uploadEmployeesFile()" style="width:90px">Upload</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#file-dlg').dialog('close')" style="width:90px">Cancel</a>
+    </div>
+
+
+    <div id="dlg" class="easyui-dialog" style="width:480px" data-options="closed:true,modal:true,border:'thin',buttons:'#dlg-buttons'">
+        <form id="fm" method="post" novalidate style="margin:0;padding:20px 50px">
+            <h3>Employee Information</h3>
+            <div style="margin-bottom:10px">
+                <input name="personnelNumber" class="easyui-textbox" label="Personnel Number:" style="width:100%">
+            </div>
+            <div style="margin-bottom:10px">
+                <input name="fullName" class="easyui-textbox" required="true" label="Full Name:" style="width:100%">
+            </div>
+            <div style="margin-bottom:10px">
+                <input name="gender" class="easyui-textbox" required="true" label="Gender:" style="width:100%">
+            </div>
+            <div style="margin-bottom:10px">
+                <input name="dateOfBirth" class="easyui-textbox" required="true" label="Date Of Birth:" style="width:100%">
+            </div>
+            <div style="margin-bottom:10px">
+                <input name="isStaff" class="easyui-textbox" label="Is Staff:" style="width:100%">
+            </div>
+        </form>
+    </div>
+    <div id="dlg-buttons">
+        <a href="javascript:void(0)" class="easyui-linkbutton c6" iconCls="icon-ok" onclick="saveEmployee()" style="width:90px">Save</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#dlg').dialog('close')" style="width:90px">Cancel</a>
+    </div>
+
+
+    <script>
+        $('#dg').datagrid({
+            fitColumns: true,
+            striped: true,
+            columns: [[
+                {
+                    field: 'personnelNumber',
+                    title: 'Personnel Number'
+                },
+                {
+                    field: 'fullName',
+                    title: 'Full Name'
+                },
+                {
+                    field: 'gender',
+                    title: 'Gender',
+                    align: 'center',
+                    width: 60,
+                    fixed: true,
+                    formatter: function (value, row, index) {
+                        if (value == 0) {
+                            return 'M';
+                        } else {
+                            return 'W';
+                        }
+                    }
+                },
+                {
+                    field: 'dateOfBirth',
+                    title: 'Date of Birth',
+                    formatter: function (value, row, index) {
+                        let date = new Date(value);
+                        return date.toLocaleDateString()
+                    }
+                },
+                {
+                    field: 'isStaff',
+                    title: 'Regular/external'
+                }
+            ]],
+            toolbar: '#tb',
+            loadMsg: 'Loading employees',
+            emptyMsg: 'The list of employees is still empty',
+            rownumbers: true,
+            singleSelect: true,
+
+            rownumbers: true,
+            pagination: true,
+            pageList: [5, 10, 15, 20, 25],
+
+            method: 'GET',
+            url: '/Employees/GetPagination',
+            queryParams: {}
+        });
+
+        function newEmployeesByFile() {
+            $('#file-dlg').dialog('open').dialog('center').dialog('setTitle', 'New Employee');
+        }
+
+        function uploadEmployeesFile() {
+            $('#uploadFile').form('submit', {
+                url: '/Employees/UploadFromFile',
+                success: function (result) {
+                    console.log(result)
+
+                    if (result) {
+                        $.messager.show({
+                            title: 'Error',
+                            msg: result
+                        });
+                    } else {
+                        $('#file-dlg').dialog('close');        // close the dialog
+                        $('#dg').datagrid('reload');    // reload the employee data
+                    }
+                }
+            });
+        }
+
+        var url;
+        function newEmployee() {
+            $('#dlg').dialog('open').dialog('center').dialog('setTitle', 'New Employee');
+            $('#fm').form('clear');
+            url = '/Employees/Create';
+        }
+
+        function editEmployee() {
+            var row = $('#dg').datagrid('getSelected');
+            if (row) {
+                $('#dlg').dialog('open').dialog('center').dialog('setTitle', 'Edit Employee');
+                $('#fm').form('load', row);
+                url = '/Employees/Edit/' + row.id;
+            }
+        }
+
+        function saveEmployee() {
+            $('#fm').form('submit', {
+                url: url,
+                iframe: false,
+                onSubmit: function () {
+                    return $(this).form('validate');
+                },
+                success: function (result) {
+                    if (result) {
+                        $.messager.show({
+                            title: 'Error',
+                            msg: result
+                        });
+                    } else {
+                        $('#dlg').dialog('close');        // close the dialog
+                        $('#dg').datagrid('reload');    // reload the employee data
+                    }
+                }
+            });
+        }
+
+        function destroyEmployee() {
+            var dg = $('#dg');
+            var row = dg.datagrid('getSelected');
+            if (row) {
+                $.messager.confirm('Confirm', 'Are you sure you want to destroy this employee?', function (r) {
+                    if (!r) { return; }
+                    console.log(r);
+
+                    $.post('/Employees/Delete', { id: row.id }, 'json')
+                        .done(function () {
+                            dg.datagrid('reload');      // reload the employee data
+                        })
+                        .fail(function () {
+                            $.messager.show({           // show error message
+                                title: 'Error',
+                                msg: result
+                            });
+                        });
+                });
+            }
+        }
+
+    </script>
+</body>
+</html>

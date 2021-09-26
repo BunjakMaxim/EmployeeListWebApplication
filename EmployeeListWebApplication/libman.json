@@ -1,0 +1,19 @@
+{
+  "version": "1.0",
+  "defaultProvider": "filesystem",
+  "libraries": [
+    {
+      "library": "C:\\Users\\bunja\\Downloads\\jquery-easyui-1.9.15",
+      "destination": "wwwroot/lib/jquery-easyui-1.9/",
+      "files": [
+        "changelog.txt",
+        "easyloader.js",
+        "jquery.easyui.min.js",
+        "jquery.easyui.mobile.js",
+        "jquery.min.js",
+        "license_freeware.txt",
+        "readme.txt"
+      ]
+    }
+  ]
+}
